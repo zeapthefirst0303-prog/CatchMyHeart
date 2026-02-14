@@ -180,69 +180,106 @@ const gameOverScreen = document.getElementById("gameOverScreen");
 document.getElementById("herName").innerText = HER_NAME;
 basket.style.left = window.innerWidth/2 + "px";
 
-// START BUTTON
+  // START BUTTON
 document.getElementById("playBtn").addEventListener("click", () => {
     startGame();
 
     // Start music on first click (avoids autoplay block)
-    const bgMusic = document.getElementById("bgMusic");
-    if(bgMusic){
-        bgMusic.play().catch(e => console.log("Autoplay blocked, will play on user interaction."));
+    if (bgMusic && bgMusic.paused) {
+        bgMusic.play().catch(e => console.log("Autoplay blocked, will play after user interaction."));
     }
 });
 
 function startGame() {
-  startScreen.style.display = "none";
-  gameOverScreen.style.display = "none";
-  nameScreen.style.display = "none";
-  messageScreen.style.display = "none";
-  valentineScreen.style.display = "none";
-  gameArea.style.display = "block";
+    // Hide all screens except game
+    startScreen.style.display = "none";
+    gameOverScreen.style.display = "none";
+    nameScreen.style.display = "none";
+    messageScreen.style.display = "none";
+    valentineScreen.style.display = "none";
+    gameArea.style.display = "block";
 
-  score = 0; brokenCaught = 0; gameStarted = true;
-  updateScoreDisplay();
+    // Reset game variables
+    score = 0;
+    brokenCaught = 0;
+    gameStarted = true;
+    updateScoreDisplay();
 
-  document.querySelectorAll('.heart, .brokenHeart').forEach(h=>h.remove());
-  clearInterval(heartInterval);
-  heartInterval = setInterval(createHeart, 500); // slower creation
+    // Remove any existing hearts
+    document.querySelectorAll('.heart, .brokenHeart').forEach(h => h.remove());
 
- 
+    // Start falling hearts
+    clearInterval(heartInterval);
+    heartInterval = setInterval(createHeart, 400); // adjust heart speed here
 }
 
 // RETRY
-function retryGame(){ startGame(); }
+function retryGame() { startGame(); }
 
 // MOVE BASKET
-document.addEventListener("touchmove", e=>{ if(gameStarted) basket.style.left=e.touches[0].clientX-25+"px";});
-document.addEventListener("mousemove", e=>{ if(gameStarted) basket.style.left=e.clientX-25+"px";});
+document.addEventListener("touchmove", e => {
+    if(gameStarted) basket.style.left = e.touches[0].clientX - 25 + "px";
+});
+document.addEventListener("mousemove", e => {
+    if(gameStarted) basket.style.left = e.clientX - 25 + "px";
+});
 
 // UPDATE COUNTER
-function updateScoreDisplay(){ scoreDisplay.innerText=`Hearts: ${score} ❤️ | Broken: ${brokenCaught} 💔`;}
+function updateScoreDisplay() {
+    scoreDisplay.innerText = `Hearts: ${score} ❤️ | Broken: ${brokenCaught} 💔`;
+}
 
-// CREATE HEARTS
-function createHeart(){
-  if(!gameStarted) return;
-  let isBroken = Math.random()<0.2;
-  let heart = document.createElement("div");
-  heart.className = isBroken?"brokenHeart":"heart";
-  heart.innerHTML=isBroken?"💔":"❤️";
-  heart.style.left = Math.random()*window.innerWidth+"px";
-  heart.style.top="0px";
-  document.body.appendChild(heart);
+// CREATE FALLING HEARTS
+function createHeart() {
+    if(!gameStarted) return;
 
-  let fall = setInterval(()=>{
-    heart.style.top = heart.offsetTop + (isBroken ? 6 : 5) + "px"; // slower fall
-    
-    if(heart.offsetTop>window.innerHeight-100 && heart.offsetLeft<basket.offsetLeft+50 && heart.offsetLeft>basket.offsetLeft-20){
-      if(isBroken){ brokenCaught++; updateScoreDisplay();
-        if(brokenCaught>=3){ gameStarted=false; clearInterval(heartInterval); document.querySelectorAll('.heart,.brokenHeart').forEach(h=>h.remove()); gameArea.style.display="none"; gameOverScreen.style.display="flex";}
-      } else { score++; updateScoreDisplay();
-        if(score>=15){ gameStarted=false; clearInterval(heartInterval); document.querySelectorAll('.heart,.brokenHeart').forEach(h=>h.remove()); gameArea.style.display="none"; nameScreen.style.display="flex";}
-      }
-      heart.remove(); clearInterval(fall);
-    }
-    if(heart.offsetTop>window.innerHeight){ heart.remove(); clearInterval(fall);}
-  },15);
+    let isBroken = Math.random() < 0.2;
+    let heart = document.createElement("div");
+    heart.className = isBroken ? "brokenHeart" : "heart";
+    heart.innerHTML = isBroken ? "💔" : "❤️";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.top = "0px";
+    document.body.appendChild(heart);
+
+    let fall = setInterval(() => {
+        heart.style.top = heart.offsetTop + (isBroken ? 6 : 5) + "px";
+
+        // Check collision with basket
+        if(heart.offsetTop > window.innerHeight - 100 &&
+           heart.offsetLeft < basket.offsetLeft + 50 &&
+           heart.offsetLeft > basket.offsetLeft - 20) {
+
+            if(isBroken) {
+                brokenCaught++;
+                updateScoreDisplay();
+                if(brokenCaught >= 3){
+                    gameStarted = false;
+                    clearInterval(heartInterval);
+                    document.querySelectorAll('.heart,.brokenHeart').forEach(h => h.remove());
+                    gameArea.style.display = "none";
+                    gameOverScreen.style.display = "flex";
+                }
+            } else {
+                score++;
+                updateScoreDisplay();
+                if(score >= 15){
+                    gameStarted = false;
+                    clearInterval(heartInterval);
+                    document.querySelectorAll('.heart,.brokenHeart').forEach(h => h.remove());
+                    gameArea.style.display = "none";
+                    nameScreen.style.display = "flex";
+                }
+            }
+
+            heart.remove();
+            clearInterval(fall);
+        }
+
+        if(heart.offsetTop > window.innerHeight){
+            heart.remove();
+            clearInterval(fall);
+        }
+    }, 15);
 }
 
 // SLIDER TO REVEAL MESSAGE
@@ -259,9 +296,7 @@ document.getElementById("nextButton").addEventListener("click", ()=>{
 document.getElementById("yes1").addEventListener("click", celebrateYes);
 document.getElementById("yes2").addEventListener("click", celebrateYes);
 
-function celebrateYes(){
-  valentineScreen.innerHTML = "<h2>🎉 Yehey! No take backs ok?
-    ILOVEYOUSOMUCH!!❤️💖</h2>";
+function cvalentineScreen.innerHTML = "<h2>🎉 Yehey! No take backs ok? ILOVEYOUSOMUCH!!❤️💖</h2>";
   startConfetti();
 }
 
