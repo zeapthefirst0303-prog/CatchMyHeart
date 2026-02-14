@@ -181,7 +181,15 @@ document.getElementById("herName").innerText = HER_NAME;
 basket.style.left = window.innerWidth/2 + "px";
 
 // START BUTTON
-document.getElementById("playBtn").addEventListener("click", startGame);
+document.getElementById("playBtn").addEventListener("click", () => {
+    startGame();
+
+    // Start music on first click (avoids autoplay block)
+    const bgMusic = document.getElementById("bgMusic");
+    if(bgMusic){
+        bgMusic.play().catch(e => console.log("Autoplay blocked, will play on user interaction."));
+    }
+});
 
 function startGame() {
   startScreen.style.display = "none";
@@ -198,9 +206,7 @@ function startGame() {
   clearInterval(heartInterval);
   heartInterval = setInterval(createHeart, 500); // slower creation
 
-  bgMusic.pause();
-  bgMusic.currentTime = 0;
-  bgMusic.play();
+ 
 }
 
 // RETRY
