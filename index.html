@@ -183,10 +183,9 @@ basket.style.left = window.innerWidth/2 + "px";
   // START BUTTON
 document.getElementById("playBtn").addEventListener("click", () => {
     startGame();
-
-    // Start music on first click (avoids autoplay block)
-    if (bgMusic && bgMusic.paused) {
-        bgMusic.play().catch(e => console.log("Autoplay blocked, will play after user interaction."));
+    // Start music on first click
+    if(bgMusic && bgMusic.paused){
+        bgMusic.play().catch(e => console.log("Autoplay blocked, will play on user interaction."));
     }
 });
 
