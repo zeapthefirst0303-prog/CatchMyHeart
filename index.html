@@ -196,7 +196,7 @@ function startGame() {
 
   document.querySelectorAll('.heart, .brokenHeart').forEach(h=>h.remove());
   clearInterval(heartInterval);
-  heartInterval = setInterval(createHeart, 350);
+  heartInterval = setInterval(createHeart, 500); // slower creation
 
   bgMusic.pause();
   bgMusic.currentTime = 0;
@@ -225,8 +225,8 @@ function createHeart(){
   document.body.appendChild(heart);
 
   let fall = setInterval(()=>{
-    heart.style.top = heart.offsetTop + (isBroken?9:7) + "px";
-
+    heart.style.top = heart.offsetTop + (isBroken ? 6 : 5) + "px"; // slower fall
+    
     if(heart.offsetTop>window.innerHeight-100 && heart.offsetLeft<basket.offsetLeft+50 && heart.offsetLeft>basket.offsetLeft-20){
       if(isBroken){ brokenCaught++; updateScoreDisplay();
         if(brokenCaught>=3){ gameStarted=false; clearInterval(heartInterval); document.querySelectorAll('.heart,.brokenHeart').forEach(h=>h.remove()); gameArea.style.display="none"; gameOverScreen.style.display="flex";}
@@ -254,13 +254,13 @@ document.getElementById("yes1").addEventListener("click", celebrateYes);
 document.getElementById("yes2").addEventListener("click", celebrateYes);
 
 function celebrateYes(){
-  valentineScreen.innerHTML = "<h2>🎉 Yay! She said YES! ❤️💖</h2>";
+  valentineScreen.innerHTML = "<h2>🎉 Yehey! No take backs ok? ❤️💖</h2>";
   startConfetti();
 }
 
 // CONFETTI
 function startConfetti(){
-  for(let i=0;i<100;i++){
+  for(let i=0;i<15;i++){
     let confetti = document.createElement("div");
     confetti.style.position="absolute";
     confetti.style.width="8px";
